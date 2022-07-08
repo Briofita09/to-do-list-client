@@ -52,7 +52,7 @@
             <label for='question'>Question:</label>
             <select id='question' for='question' name='question' bind:value={question}>
                 {#each questions as question }
-                <option>{question}</option>                    
+                <option value={question}>{question}</option>                    
                 {/each}
             </select>
         </div>
