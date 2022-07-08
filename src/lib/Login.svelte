@@ -1,55 +1,78 @@
 <script>
-    import axios from 'axios'
+    import axios from "axios"
+    import {useNavigate, link} from "svelte-navigator"
+    import {secretToken} from "../stores/stores.js"
 
-    let questions = [
-        'Qual o nome da sua mãe?',
-        'Qual o nome do seu pet?',
-        'Qual a sua cor favorita?',
-        'Qual a sua comida favorita?',
-        'Qual o seu esporte favorito?'
-    ]
-    let name = ''
-    let email = ''
-    let password = ''
-    let question = ''
-    let answer = ''
-    function handleSubmit(e){
-        e.preventDefault()
-        console.log(name, email, password, question, answer)
-        let user = {name, email, password, question, answer}
-        axios.post('http://localhost:4000/sign-up', user)
-        name = ''
-        email = ''
-        password = ''
-        question = ''
-        answer = ''
+    let email= ''
+    let password =''
+    const navigate = useNavigate()
+
+    async function handleSubmit(e){
+        try{
+            e.preventDefault()
+            let user ={email, password}
+           const response = await axios.post('http://localhost:4000/login', user)
+           if(response.status === 200){
+               secretToken.update(value => {return value = response.data.token})
+               navigate('/cards')
+           }
+        } catch(err){
+            alert(err)
+        }       
     }
+
 </script>
 
 <main>
 
-    <h1>Faça seu cadastro</h1>
+    <h1>Faça Login!</h1>
 
     <form>
-        <label for='name'>Nome:</label>
-        <input type='text' id='name' name='name' bind:value={name}/>
-        <label for='email'>E-mail:</label>
-        <input type='text' id='email' name='email' bind:value={email}/>
-        <label for='password'>Senha:</label>
-        <input type='text' id='password' name='password' bind:value={password}/>
-        <label for='question'>Question:</label>
-        <select id='question' for='question' name='question' bind:value={question}>
-            <option>{questions[0]}</option>
-            <option>{questions[1]}</option>
-            <option>{questions[2]}</option>
-            <option>{questions[3]}</option>
-            <option>{questions[4]}</option>
-        </select>
-        <label for='answer'>Resposta:</label>
-        <input type='text' id='answer' name='answer' bind:value={answer}/>
-        <button type="submit" on:click={handleSubmit}>Cadastrar!</button>
+        <div>
+            <label for='email'>E-mail:</label>
+            <input type='text' id='email' name='email' bind:value={email}/>
+        </div>
+        <div>
+            <label for='password'>Senha:</label>
+            <input type='text' id='password' name='password' bind:value={password}/>
+        </div>
+        <button type="submit" on:click={handleSubmit}>Login!</button>
     </form>
-
-
-
+    <a href='/' class="my-link" use:link><h3>Não é cadastrado, faça seu cadastro aqui!</h3></a>
 </main>
+
+<style>
+h1, h3{
+    text-align: center;
+    
+}
+
+.my-link {
+    color: black;
+    text-decoration: none;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 0 10%;
+
+    border: 1px solid black;
+}
+
+label {
+    text-align: start;
+}
+
+form input{
+    margin: 10px 0;
+    width: 150px;
+}
+
+button{
+    width: 70px;
+    height: 40px;
+    margin-bottom: 10px;
+}
+</style>
